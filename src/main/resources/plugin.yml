@@ -1,0 +1,4 @@
+name: BoneHurtingJuic
+version: 1.0
+main: io.github.cultofclang.bonehurtingjuice.BoneHurtPlugin
+api-version: 1.15
