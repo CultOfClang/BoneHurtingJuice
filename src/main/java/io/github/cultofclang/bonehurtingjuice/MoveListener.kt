@@ -1,6 +1,5 @@
 package io.github.cultofclang.bonehurtingjuice
 
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -8,7 +7,6 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.util.NumberConversions.floor
-import org.bukkit.util.NumberConversions.toInt
 import org.bukkit.util.Vector
 
 object MoveListener : Listener{
@@ -23,8 +21,11 @@ object MoveListener : Listener{
         }
     }
 
-    val hurtyBlock = setOf(Material.LAVA, Material.SLIME_BLOCK, Material.WATER, Material.HAY_BLOCK, Material.COBWEB,
-            Material.HONEY_BLOCK,
+    val hurtBlock = setOf(Material.LAVA, Material.SLIME_BLOCK, Material.WATER, Material.HAY_BLOCK, Material.COBWEB,
+            Material.LADDER, Material.VINE,
+
+            Material.HONEY_BLOCK, // need to implement sliding
+
             Material.WHITE_BED,
             Material.ORANGE_BED,
             Material.MAGENTA_BED,
@@ -65,10 +66,10 @@ object MoveListener : Listener{
             for (p in shittyLine(start, vel)){
                 val location = p.toLocation(world)
                 val block = location.block
-                if(block.type in hurtyBlock){
+                if(block.type in hurtBlock){
 
                     val damage = (fallDistance / 2 -3).coerceAtLeast(0f)
-                    e.player.sendMessage("ouch $damage you moved $p ${block.type.name} after $fallDistance")
+                    //e.player.sendMessage("ouch $damage you moved $p ${block.type.name} after $fallDistance")
 
 
 
