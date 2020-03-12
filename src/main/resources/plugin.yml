@@ -1,4 +1,10 @@
-name: BoneHurtingJuic
-version: 1.0
+name: BoneHurtingJuice
+version: 1.1
 main: io.github.cultofclang.bonehurtingjuice.BoneHurtPlugin
 api-version: 1.15
+depend:
+  - KotlinSupport
+commands:
+  boneinfo:
+               description: Why are my bones hurting?
+               usage: /boneinfo
