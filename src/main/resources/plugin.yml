@@ -3,7 +3,7 @@ version: @plugin_version@
 main: io.github.cultofclang.bonehurtingjuice.BoneHurtPlugin
 api-version: 1.15
 depend:
-  - KotlinSupport
+  - mckotlinlibs
 commands:
   boneinfo:
                description: Why are my bones hurting?
