@@ -9,7 +9,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 group 'org.cultofclang.minecraft'
 
-if (System.hasProperty("GITHUB_RUN_NUMBER")) {
+if (System.getenv("GITHUB_RUN_NUMBER")!=null) {
     plugin_version += "." + System.getenv("GITHUB_RUN_NUMBER")
 }
 
