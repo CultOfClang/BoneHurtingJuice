@@ -1,5 +1,5 @@
 name: BoneHurtingJuice
-version: 1.1
+version: @plugin_version@
 main: io.github.cultofclang.bonehurtingjuice.BoneHurtPlugin
 api-version: 1.15
 depend:

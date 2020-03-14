@@ -11,7 +11,9 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.util.NumberConversions.floor
 import org.bukkit.util.Vector
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sin
 import kotlin.random.Random
 
 object MoveListener : Listener {
@@ -26,36 +28,6 @@ object MoveListener : Listener {
             e.player.sendMessage("You clicked a stick named [${e.item?.itemMeta?.displayName ?: "Unnamed"}]")
         }
     }
-
-    private val hurtBlock = setOf(
-        Material.LAVA,
-        Material.SLIME_BLOCK,
-        Material.WATER,
-        Material.HAY_BLOCK,
-        Material.COBWEB,
-        Material.LADDER,
-        Material.VINE,
-        Material.SWEET_BERRY_BUSH,
-
-        Material.HONEY_BLOCK, // need to implement sliding
-
-        Material.WHITE_BED,
-        Material.ORANGE_BED,
-        Material.MAGENTA_BED,
-        Material.LIGHT_BLUE_BED,
-        Material.YELLOW_BED,
-        Material.LIME_BED,
-        Material.PINK_BED,
-        Material.GRAY_BED,
-        Material.LIGHT_GRAY_BED,
-        Material.CYAN_BED,
-        Material.BLUE_BED,
-        Material.PURPLE_BED,
-        Material.GREEN_BED,
-        Material.BROWN_BED,
-        Material.RED_BED,
-        Material.BLACK_BED
-    )
 
     //minecarts when they fall onto track will cancel fall damage, but they arent transported
 
@@ -72,32 +44,39 @@ object MoveListener : Listener {
         val fallDistance = e.player.fallDistance
 
 
-        if(fallDistance.roundToInt() == 50){
-            e.player.playSound(e.to!!, Sound.ITEM_ELYTRA_FLYING, 1f, 1f)
-        }
+        //if(fallDistance.roundToInt() == 50){ }
 
         if(fallDistance > 50){
             e.player.damage(fallDistance/100.0)
-            /*
-            val yeet = Vector.getRandom()
-            yeet.y = 0.0
-            yeet.normalize()
-            val max = fallDistance / 100.0
 
-            yeet.multiply(fallDistance / 100.0)
 
-            val maxHorVel = 3.0
-            val newVel = e.player.velocity.add(yeet)
-            e.player.velocity = Vector(
-                newVel.x.coerceIn(-maxHorVel, maxHorVel),
-                newVel.y,
-                newVel.z.coerceIn(-maxHorVel, maxHorVel)
-            )
-             */
+
+            if(Bones.doApplyForce) {
+                val yeet = Vector.getRandom()
+                yeet.y = 0.0
+                yeet.normalize()
+                val max = fallDistance / 100.0
+
+                yeet.multiply(fallDistance / 100.0)
+
+
+                val angle = 0f
+                val wind = Vector(sin(angle), 0f, cos(angle))
+
+                val maxHorVel = 3.0
+                val newVel = e.player.velocity.add(yeet)
+
+
+                e.player.velocity = Vector(
+                    newVel.x.coerceIn(-maxHorVel, maxHorVel),
+                    newVel.y,
+                    newVel.z.coerceIn(-maxHorVel, maxHorVel)
+                )
+            }
 
             val spawnPos = e.to!!
 
-
+            e.player.playSound(e.to!!, Sound.ITEM_ELYTRA_FLYING, 1f, 1f)
             e.player.spawnParticle(Particle.CLOUD, spawnPos, 10, 0.5,0.5,0.5)
 
             if(Random.nextFloat() < 1f/10000)
@@ -113,13 +92,11 @@ object MoveListener : Listener {
             for (p in shittyLine(start, vel)) {
                 val location = p.toLocation(world)
                 val block = location.block
-                if (block.type in hurtBlock) {
+                if (block.type in Bones.hurtBlocks) {
 
-                    val damage = (fallDistance / 2 - 3).coerceAtLeast(0f)
+                    val damage = (fallDistance* Bones.damageMultiplier - 3).coerceAtLeast(0.0)
                     //e.player.sendMessage("ouch $damage you moved $p ${block.type.name} after $fallDistance")
-
-
-                    e.player.damage(damage.toDouble())
+                    e.player.damage(damage)
                     break
                 }
             }
