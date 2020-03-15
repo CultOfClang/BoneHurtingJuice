@@ -1,4 +1,4 @@
-package io.github.cultofclang.bonehurtingjuice
+package org.cultofclang.bonehurtingjuice
 
 import org.bukkit.Material
 

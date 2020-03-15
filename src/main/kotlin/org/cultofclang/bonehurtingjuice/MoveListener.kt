@@ -1,4 +1,4 @@
-package io.github.cultofclang.bonehurtingjuice
+package org.cultofclang.bonehurtingjuice
 
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -95,7 +95,7 @@ object MoveListener : Listener {
                 if (block.type in Bones.hurtBlocks) {
 
                     val damage = (fallDistance* Bones.damageMultiplier - 3).coerceAtLeast(0.0)
-                    //e.player.sendMessage("ouch $damage you moved $p ${block.type.name} after $fallDistance")
+                    e.player.sendMessage("ouch! ${block.type.name} wasn't as soft as it looked")
                     e.player.damage(damage)
                     break
                 }

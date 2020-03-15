@@ -1,4 +1,4 @@
-package io.github.cultofclang.bonehurtingjuice.command
+package org.cultofclang.bonehurtingjuice.command
 
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor

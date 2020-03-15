@@ -1,11 +1,12 @@
-package io.github.cultofclang.bonehurtingjuice
+package org.cultofclang.bonehurtingjuice
 
-import io.github.cultofclang.bonehurtingjuice.command.InfoCmd
+import org.cultofclang.bonehurtingjuice.command.InfoCmd
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
 
-val Bones: BoneHurtPlugin by lazy { JavaPlugin.getPlugin(BoneHurtPlugin::class.java) }
+val Bones: BoneHurtPlugin by lazy { JavaPlugin.getPlugin(
+    BoneHurtPlugin::class.java) }
 
 
 class BoneHurtPlugin : JavaPlugin() {
