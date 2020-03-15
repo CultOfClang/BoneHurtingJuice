@@ -1,6 +1,6 @@
 name: BoneHurtingJuice
 version: @plugin_version@
-main: io.github.cultofclang.bonehurtingjuice.BoneHurtPlugin
+main: org.cultofclang.bonehurtingjuice.BoneHurtPlugin
 api-version: 1.15
 depend:
   - KotlinSpice
