@@ -94,7 +94,7 @@ object MoveListener : Listener {
                 val block = location.block
                 if (block.type in Bones.hurtBlocks) {
 
-                    val damage = (fallDistance* Bones.damageMultiplier - 3).coerceAtLeast(0.0)
+                    val damage = ((fallDistance-3)* Bones.damageMultiplier).coerceAtLeast(0.0)
                     e.player.sendMessage("ouch! ${block.type.name} wasn't as soft as it looked")
                     e.player.damage(damage)
                     break
