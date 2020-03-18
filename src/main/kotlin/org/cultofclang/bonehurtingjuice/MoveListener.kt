@@ -6,8 +6,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
+import org.bukkit.util.NumberConversions.ceil
 import org.bukkit.util.NumberConversions.floor
 import org.bukkit.util.Vector
+import kotlin.math.abs
 import kotlin.random.Random
 
 object MoveListener : Listener {
@@ -15,14 +17,17 @@ object MoveListener : Listener {
     fun onMove(e: VehicleMoveEvent){
         for (rider in e.vehicle.passengers){
             if(rider != null && rider is Player){
-                doFallDamage(rider, e.vehicle.fallDistance, e.from)
+                doFallDamage(rider, e.vehicle.fallDistance, e.from, allFallsHurt = true)
             }
         }
     }
 
-    private fun doFallDamage(player: Player, fallDistance:Float, from:Location){
+    private fun doFallDamage(player: Player, fallDistance:Float, from:Location, allFallsHurt:Boolean = false, to:Location? = null){
+        if (player.isInvulnerable || player.gameMode == GameMode.CREATIVE)
+            return
+
         if(fallDistance > 50){
-            player.damage(fallDistance/100.0)
+
 
             if(Bones.doApplyForce) {
                 val yeet = Vector.getRandom()
@@ -46,8 +51,14 @@ object MoveListener : Listener {
             }
 
             val spawnPos = player.location
-            if(Random.nextFloat() < 1f/50)
+            if(Random.nextFloat() < 1f/20){
                 player.playSound(spawnPos, Sound.ITEM_ELYTRA_FLYING, 1f, 1f)
+            }
+
+            if(Random.nextFloat() < 1f/5) {
+                player.damage(5.0)
+            }
+
             player.spawnParticle(Particle.CLOUD, spawnPos, 10, 0.5,0.5,0.5)
 
             if(Random.nextFloat() < 1f/10000)
@@ -55,6 +66,13 @@ object MoveListener : Listener {
         }
 
         if (fallDistance > 3) {
+
+            if(to != null){
+                val velY = player.velocity.y
+                val moveY = to.y - from.y
+                abs(velY - moveY)
+            }
+
             val start = from.toVector()
             val vel = player.velocity
 
@@ -63,7 +81,9 @@ object MoveListener : Listener {
             for (p in shittyLine(start, vel)) {
                 val location = p.toLocation(world)
                 val block = location.block
-                if (block.type in Bones.hurtBlocks) {
+
+                //player.sendMessage("look at ${block.location.blockY} ${block.type.name}")
+                if ((allFallsHurt && block.type != Material.AIR )||block.type in Bones.hurtBlocks) {
 
                     val damage = ((fallDistance-3)* Bones.damageMultiplier).coerceAtLeast(0.0)
                     player.sendMessage("ouch! ${block.type.name} wasn't as soft as it looked")
@@ -77,30 +97,25 @@ object MoveListener : Listener {
     @EventHandler
     fun onMove(e: PlayerMoveEvent) {
 
-        if (e.player.isInvulnerable)
-            return
 
-        doFallDamage(e.player, e.player.fallDistance, e.from)
+        val velY = e.player.velocity.y
+        val moveY = e.to!!.y - e.from.y
+        //if(e.player.fallDistance > 10) e.player.sendMessage("moving at ${velY} ${moveY}")
+
+
+        doFallDamage(e.player, e.player.fallDistance, e.from, to=e.to)
     }
 }
-
 
 fun Vector.block(): Vector {
     return Vector(blockX, blockY, blockZ)
 }
 
 fun shittyLine(from: Vector, v: Vector) = sequence {
-    val startY = floor(from.y)
-    val endY = floor(from.y + v.y)
+        val steps = -floor(v.y-1)
 
-    if (startY == endY) {
-        yield(from.block())
-    } else {
-        val vel = v.clone().multiply(1 / v.y)
-        val o = from.clone().subtract(vel.clone().multiply(startY))
 
-        for (y in startY downTo endY - 1) {
-            yield(o.clone().add(vel.clone().multiply(y)).block())
-        }
+    for (dy in 0..steps) {
+        yield(from.clone().add(Vector(0, -dy, 0)).block())
     }
 }
