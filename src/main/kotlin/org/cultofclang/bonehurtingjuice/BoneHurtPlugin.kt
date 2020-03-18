@@ -19,17 +19,12 @@ class BoneHurtPlugin : JavaPlugin() {
         Bukkit.getPluginManager().registerEvents(MoveListener, this)
         logger.info("Off ouch owe my bones!")
 
-
-
+        // kotlin magic
         val c = config
-
 
         saveDefaultConfig()
 
-        //c.addDefault("hurtBlocks",hurtBlocks.toList())
-
         val hurtBlockRaw=c.getStringList("hurtBlocks")
-        if(hurtBlockRaw != null)
         hurtBlocks = hurtBlockRaw.map {Material.valueOf(it)}.toSet()
         doApplyForce = c.getBoolean("applyFallForce", false)
         damageMultiplier = c.getDouble("damageMultiplier", 0.5)

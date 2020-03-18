@@ -1,35 +1,16 @@
 package org.cultofclang.bonehurtingjuice
 
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Particle
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
 import org.bukkit.util.NumberConversions.floor
 import org.bukkit.util.Vector
-import kotlin.math.cos
-import kotlin.math.sin
 import kotlin.random.Random
 
 object MoveListener : Listener {
-
-
-
-    @EventHandler
-    fun onStickClick(e: PlayerInteractEvent) {
-        if (e.action == Action.PHYSICAL) return //make sure it isn't a pressure plate or tripwire
-
-        if (e.item?.type == Material.STICK) {
-            e.player.sendMessage("You clicked a stick named [${e.item?.itemMeta?.displayName ?: "Unnamed"}]")
-        }
-    }
-
     @EventHandler
     fun onMove(e: VehicleMoveEvent){
         for (rider in e.vehicle.passengers){
@@ -53,8 +34,7 @@ object MoveListener : Listener {
 
                 yeet.multiply(max)
 
-
-                val angle = 0f
+                //val angle = 0f
                 //val wind = Vector(sin(angle), 0f, cos(angle))
 
                 val maxHorVel = 3.0
@@ -100,7 +80,7 @@ object MoveListener : Listener {
     @EventHandler
     fun onMove(e: PlayerMoveEvent) {
 
-        if (e.player.isFlying)
+        if (e.player.isInvulnerable)
             return
 
         doFallDamage(e.player, e.player.fallDistance, e.from)
