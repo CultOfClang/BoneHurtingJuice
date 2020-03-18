@@ -20,8 +20,8 @@ object MoveListener : Listener {
 
 
     @EventHandler
-    public fun onStickClick(e: PlayerInteractEvent) {
-        if (e.action == Action.PHYSICAL) return; //make sure it isn't a pressure plate or tripwire
+    fun onStickClick(e: PlayerInteractEvent) {
+        if (e.action == Action.PHYSICAL) return //make sure it isn't a pressure plate or tripwire
 
         if (e.item?.type == Material.STICK) {
             e.player.sendMessage("You clicked a stick named [${e.item?.itemMeta?.displayName ?: "Unnamed"}]")
@@ -31,7 +31,7 @@ object MoveListener : Listener {
     //minecarts when they fall onto track will cancel fall damage, but they arent transported
 
     @EventHandler
-    public fun onMove(e: VehicleMoveEvent){
+    fun onMove(e: VehicleMoveEvent){
         for (rider in e.vehicle.passengers){
             if(rider != null && rider is Player){
                 doFallDamage(rider, e.vehicle.fallDistance, e.from)
@@ -39,7 +39,7 @@ object MoveListener : Listener {
         }
     }
 
-    public fun doFallDamage(player: Player, fallDistance:Float, from:Location){
+    fun doFallDamage(player: Player, fallDistance:Float, from:Location){
         if(fallDistance > 50){
             player.damage(fallDistance/100.0)
 
@@ -98,10 +98,10 @@ object MoveListener : Listener {
     }
 
     @EventHandler
-    public fun onMove(e: PlayerMoveEvent) {
+    fun onMove(e: PlayerMoveEvent) {
 
         if (e.player.isFlying)
-            return;
+            return
 
         doFallDamage(e.player, e.player.fallDistance, e.from)
     }

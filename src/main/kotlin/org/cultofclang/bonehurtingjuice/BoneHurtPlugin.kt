@@ -10,11 +10,11 @@ val Bones: BoneHurtPlugin by lazy { JavaPlugin.getPlugin(
 
 
 class BoneHurtPlugin : JavaPlugin() {
-    public var hurtBlocks: Set<Material> = emptySet()
-    public var doApplyForce = false
-    public var damageMultiplier = 0.5
+    var hurtBlocks: Set<Material> = emptySet()
+    var doApplyForce = false
+    var damageMultiplier = 0.5
 
-    public override fun onEnable(){
+    override fun onEnable(){
         getCommand("boneinfo")?.setExecutor(InfoCmd)
         Bukkit.getPluginManager().registerEvents(MoveListener, this)
         logger.info("Off ouch owe my bones!")
@@ -35,7 +35,7 @@ class BoneHurtPlugin : JavaPlugin() {
         damageMultiplier = c.getDouble("damageMultiplier", 0.5)
     }
 
-    public override fun onDisable() {
+    override fun onDisable() {
         logger.info("I don't think you see the gravity of the situation.")
         saveDefaultConfig()
     }
