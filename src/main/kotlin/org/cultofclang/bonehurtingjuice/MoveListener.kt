@@ -24,8 +24,6 @@ object MoveListener : Listener {
         if(fallDistance > 50){
             player.damage(fallDistance/100.0)
 
-
-
             if(Bones.doApplyForce) {
                 val yeet = Vector.getRandom()
                 yeet.y = 0.0
@@ -40,7 +38,6 @@ object MoveListener : Listener {
                 val maxHorVel = 3.0
                 val newVel = player.velocity.add(yeet)
 
-
                 player.velocity = Vector(
                     newVel.x.coerceIn(-maxHorVel, maxHorVel),
                     newVel.y,
@@ -49,8 +46,8 @@ object MoveListener : Listener {
             }
 
             val spawnPos = player.location
-
-            player.playSound(spawnPos, Sound.ITEM_ELYTRA_FLYING, 1f, 1f)
+            if(Random.nextFloat() < 1f/50)
+                player.playSound(spawnPos, Sound.ITEM_ELYTRA_FLYING, 1f, 1f)
             player.spawnParticle(Particle.CLOUD, spawnPos, 10, 0.5,0.5,0.5)
 
             if(Random.nextFloat() < 1f/10000)
