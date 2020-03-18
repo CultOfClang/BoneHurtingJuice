@@ -1,6 +1,9 @@
 package org.cultofclang.bonehurtingjuice
 
-import org.bukkit.*
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.Particle
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -11,7 +14,6 @@ import org.bukkit.event.vehicle.VehicleMoveEvent
 import org.bukkit.util.NumberConversions.floor
 import org.bukkit.util.Vector
 import kotlin.math.cos
-import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -28,8 +30,6 @@ object MoveListener : Listener {
         }
     }
 
-    //minecarts when they fall onto track will cancel fall damage, but they arent transported
-
     @EventHandler
     fun onMove(e: VehicleMoveEvent){
         for (rider in e.vehicle.passengers){
@@ -39,7 +39,7 @@ object MoveListener : Listener {
         }
     }
 
-    fun doFallDamage(player: Player, fallDistance:Float, from:Location){
+    private fun doFallDamage(player: Player, fallDistance:Float, from:Location){
         if(fallDistance > 50){
             player.damage(fallDistance/100.0)
 
@@ -51,11 +51,11 @@ object MoveListener : Listener {
                 yeet.normalize()
                 val max = fallDistance / 100.0
 
-                yeet.multiply(fallDistance / 100.0)
+                yeet.multiply(max)
 
 
                 val angle = 0f
-                val wind = Vector(sin(angle), 0f, cos(angle))
+                //val wind = Vector(sin(angle), 0f, cos(angle))
 
                 val maxHorVel = 3.0
                 val newVel = player.velocity.add(yeet)
@@ -112,7 +112,7 @@ fun Vector.block(): Vector {
     return Vector(blockX, blockY, blockZ)
 }
 
-fun shittyLine(from: Vector, v: Vector) = sequence<Vector> {
+fun shittyLine(from: Vector, v: Vector) = sequence {
     val startY = floor(from.y)
     val endY = floor(from.y + v.y)
 
