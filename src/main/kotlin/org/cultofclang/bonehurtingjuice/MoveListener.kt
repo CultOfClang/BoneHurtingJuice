@@ -13,21 +13,43 @@ import org.bukkit.event.vehicle.VehicleMoveEvent
 import org.bukkit.util.NumberConversions.ceil
 import org.bukkit.util.NumberConversions.floor
 import org.bukkit.util.Vector
+import java.util.*
 import kotlin.math.abs
 import kotlin.random.Random
 
 
 object MoveListener : Listener {
+    private val fallDistances:MutableMap<UUID, Float> = mutableMapOf()
+
+
+    @EventHandler
+    fun ifThisWorks(e: PlayerMoveEvent) {
+
+        val player = e.player
+        val lastFallDist = fallDistances.getOrDefault(player.uniqueId, 0f)
+        val newFallDist = player.fallDistance
+
+        val bonesBroken = (lastFallDist - newFallDist).coerceAtLeast(0f)
+
+
+        if(bonesBroken > Bones.minFallDist) {
+            if(debugPrint) e.player.sendMessage("ouch x$bonesBroken")
+            val damage = ((bonesBroken- Bones.minFallDist)* Bones.damageMultiplier)
+
+
+
+        }
+        fallDistances[e.player.uniqueId]  = newFallDist
+    }
 
     const val debugPrint = false
     @EventHandler
     fun onMove(e: VehicleMoveEvent){
         for (rider in e.vehicle.passengers){
             if(rider != null && rider is Player){
-
                 var vel = rider.velocity
                 doFallDamage(rider, e.vehicle.fallDistance, e.from, to = e.to, allFallsHurt = true, velocity = vel)
-                rider.sendMessage("move ${e.to.y} ${e.from.y} ${vel} ${e.vehicle.fallDistance}")
+                //rider.sendMessage("move ${e.to.y} ${e.from.y} ${vel} ${e.vehicle.fallDistance}")
             }
         }
     }
@@ -99,9 +121,10 @@ object MoveListener : Listener {
         if (fallDistance > 3) {
 
             val start = from.toVector()
-            val vel = player.velocity
+            var vel = player.velocity
 
             if(to != null){
+                val movevel = to.toVector().clone().subtract(from.toVector())
                 val velY = velocity.y
                 val moveY = to.y - from.y
                 val diff = abs(velY - moveY)
@@ -161,7 +184,7 @@ fun Vector.block(): Vector {
 }
 
 fun shittyLine(from: Vector, v: Vector) = sequence {
-        val steps = (ceil(abs(v.y))+1).toInt()
+        val steps = (abs(v.y)*2+1).toInt()
 
     val step = v.clone().multiply(1/v.y)
 
