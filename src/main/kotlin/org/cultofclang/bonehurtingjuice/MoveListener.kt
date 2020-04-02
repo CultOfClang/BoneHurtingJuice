@@ -4,7 +4,11 @@ import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByBlockEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.vehicle.VehicleEnterEvent
+import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
 import org.bukkit.util.NumberConversions.ceil
 import org.bukkit.util.NumberConversions.floor
@@ -12,17 +16,44 @@ import org.bukkit.util.Vector
 import kotlin.math.abs
 import kotlin.random.Random
 
+
 object MoveListener : Listener {
+
+    const val debugPrint = false
     @EventHandler
     fun onMove(e: VehicleMoveEvent){
         for (rider in e.vehicle.passengers){
             if(rider != null && rider is Player){
-                doFallDamage(rider, e.vehicle.fallDistance, e.from, allFallsHurt = true)
+
+                var vel = rider.velocity
+                doFallDamage(rider, e.vehicle.fallDistance, e.from, to = e.to, allFallsHurt = true, velocity = vel)
+                rider.sendMessage("move ${e.to.y} ${e.from.y} ${vel} ${e.vehicle.fallDistance}")
             }
         }
     }
 
-    private fun doFallDamage(player: Player, fallDistance:Float, from:Location, allFallsHurt:Boolean = false, to:Location? = null){
+
+    @EventHandler
+    fun onEnter(e: VehicleExitEvent){
+        for (rider in e.vehicle.passengers){
+            if(rider != null && rider is Player){
+                rider.fallDistance += e.vehicle.fallDistance
+            }
+        }
+    }
+
+    @EventHandler
+    fun onExit(e: VehicleEnterEvent){
+        for (rider in e.vehicle.passengers){
+            if(rider != null && rider is Player){
+                e.vehicle.fallDistance += rider.fallDistance
+            }
+        }
+    }
+
+    private val Material.humanName get() = name.replace('_',' ').toLowerCase()
+
+    private fun doFallDamage(player: Player, fallDistance:Float, from:Location,to:Location,velocity:Vector, allFallsHurt:Boolean = false){
         if (player.isInvulnerable || player.gameMode == GameMode.CREATIVE)
             return
 
@@ -41,7 +72,7 @@ object MoveListener : Listener {
                 //val wind = Vector(sin(angle), 0f, cos(angle))
 
                 val maxHorVel = 3.0
-                val newVel = player.velocity.add(yeet)
+                val newVel = velocity.add(yeet)
 
                 player.velocity = Vector(
                     newVel.x.coerceIn(-maxHorVel, maxHorVel),
@@ -50,7 +81,7 @@ object MoveListener : Listener {
                 )
             }
 
-            val spawnPos = player.location
+            val spawnPos = from
             if(Random.nextFloat() < 1f/20){
                 player.playSound(spawnPos, Sound.ITEM_ELYTRA_FLYING, 1f, 1f)
             }
@@ -67,14 +98,25 @@ object MoveListener : Listener {
 
         if (fallDistance > 3) {
 
-            if(to != null){
-                val velY = player.velocity.y
-                val moveY = to.y - from.y
-                abs(velY - moveY)
-            }
-
             val start = from.toVector()
             val vel = player.velocity
+
+            if(to != null){
+                val velY = velocity.y
+                val moveY = to.y - from.y
+                val diff = abs(velY - moveY)
+
+                vel.y = minOf(moveY, velY)
+
+                // need to test with
+
+                if(debugPrint){
+                player.sendMessage("moving at $velY $moveY $diff")
+                }
+                    //if(diff<0.1) return
+            }
+
+
 
             val world = from.world!!
 
@@ -82,12 +124,26 @@ object MoveListener : Listener {
                 val location = p.toLocation(world)
                 val block = location.block
 
-                //player.sendMessage("look at ${block.location.blockY} ${block.type.name}")
-                if ((allFallsHurt && block.type != Material.AIR )||block.type in Bones.hurtBlocks) {
+                if(debugPrint){
+                player.sendMessage("look at ${block.location.blockY} ${block.type.name}")
+                }
+                    if ((allFallsHurt && block.type != Material.AIR )||block.type in Bones.hurtBlocks) {
 
                     val damage = ((fallDistance-3)* Bones.damageMultiplier).coerceAtLeast(0.0)
-                    player.sendMessage("ouch! ${block.type.name} wasn't as soft as it looked")
-                    player.damage(damage)
+
+                    if(damage > 1) {
+                        player.sendMessage("ouch! ${block.type.humanName} wasn't as soft as it looked")
+
+                        //todo not sure if im doing double damage
+                        player.noDamageTicks = 0
+                        player.damage(damage)
+
+                        //player.lastDamage = damage + player.lastDamage
+                        //val fallEvent = EntityDamageByBlockEvent(block, player, EntityDamageEvent.DamageCause.FALL, damage)
+                        //player.lastDamageCause = fallEvent
+                        //Bukkit.getServer().pluginManager.callEvent(fallEvent);
+
+                    }
                     break
                 }
             }
@@ -96,14 +152,7 @@ object MoveListener : Listener {
 
     @EventHandler
     fun onMove(e: PlayerMoveEvent) {
-
-
-        val velY = e.player.velocity.y
-        val moveY = e.to!!.y - e.from.y
-        //if(e.player.fallDistance > 10) e.player.sendMessage("moving at ${velY} ${moveY}")
-
-
-        doFallDamage(e.player, e.player.fallDistance, e.from, to=e.to)
+        doFallDamage(e.player, e.player.fallDistance, e.from, to=e.to!!, velocity = e.player.velocity)
     }
 }
 
@@ -112,10 +161,13 @@ fun Vector.block(): Vector {
 }
 
 fun shittyLine(from: Vector, v: Vector) = sequence {
-        val steps = -floor(v.y-1)
+        val steps = (ceil(abs(v.y))+1).toInt()
 
+    val step = v.clone().multiply(1/v.y)
 
     for (dy in 0..steps) {
-        yield(from.clone().add(Vector(0, -dy, 0)).block())
+
+        //may be negative
+        yield(from.clone().add(step.clone().multiply(-dy)).block())
     }
 }
