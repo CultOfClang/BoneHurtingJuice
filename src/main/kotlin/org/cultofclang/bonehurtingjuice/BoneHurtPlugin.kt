@@ -13,6 +13,7 @@ class BoneHurtPlugin : JavaPlugin() {
     var hurtBlocks: Set<Material> = emptySet()
     var doApplyForce = false
     var damageMultiplier = 0.5
+    var minFallDist = 3
 
     override fun onEnable(){
         getCommand("boneinfo")?.setExecutor(InfoCmd)
@@ -28,6 +29,7 @@ class BoneHurtPlugin : JavaPlugin() {
         hurtBlocks = hurtBlockRaw.map {Material.valueOf(it)}.toSet()
         doApplyForce = c.getBoolean("applyFallForce", false)
         damageMultiplier = c.getDouble("damageMultiplier", 0.5)
+        minFallDist = c.getInt("minFallDist", 3)
     }
 
     override fun onDisable() {
