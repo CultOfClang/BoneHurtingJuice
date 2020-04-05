@@ -26,4 +26,4 @@ hurtBlocks:
   - BLACK_BED
   - SCAFFOLDING
 applyFallForce: false
-damageMultiplier : 0.5
+damageMultiplier : 1

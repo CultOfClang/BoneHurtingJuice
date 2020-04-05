@@ -3,7 +3,10 @@ package org.cultofclang.bonehurtingjuice
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerVelocityEvent
+import org.bukkit.event.player.PlayerBedEnterEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.vehicle.VehicleExitEvent
@@ -14,7 +17,25 @@ object MoveListener : Listener {
     private val fallDistances:MutableMap<UUID, Float> = mutableMapOf()
 
     @EventHandler
-    fun ifThisWorks(e: PlayerMoveEvent) {
+    fun onPlayerDamage(event: EntityDamageEvent) {
+        val ent = event.entity
+        if (ent is Player && event.cause == EntityDamageEvent.DamageCause.FALL) {
+            event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun cantUseBedsIfYouAreFalling(e: PlayerBedEnterEvent) {
+        val player = e.player
+
+        if(player.isInsideVehicle || player.fallDistance > Bones.minFallDist ){
+            e.isCancelled = true
+        }
+
+    }
+
+    @EventHandler
+    fun ifThisWorks(e: PlayerVelocityEvent) {
         val player = e.player
 
         if(!player.isInsideVehicle)
@@ -33,8 +54,6 @@ object MoveListener : Listener {
         val bonesBroken = (lastFallDist - fallDist).coerceAtLeast(0f)
         fallDistances[player.uniqueId]  = fallDist
 
-        //player.sendMessage("ouch $lastFallDist $fallDist")
-
         if(bonesBroken > Bones.minFallDist) {
             //if(debugPrint)
             val damage = ((bonesBroken- Bones.minFallDist)* Bones.damageMultiplier)
@@ -42,8 +61,6 @@ object MoveListener : Listener {
             player.damage(damage)
         }
     }
-
-    const val debugPrint = false
 
     @EventHandler
     fun onMove(e: VehicleMoveEvent){
@@ -74,5 +91,4 @@ object MoveListener : Listener {
             }
         }
     }
-
 }
