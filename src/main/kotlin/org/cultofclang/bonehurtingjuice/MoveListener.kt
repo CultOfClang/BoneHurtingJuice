@@ -21,6 +21,7 @@ object MoveListener : Listener {
         val ent = event.entity
         if (ent is Player && event.cause == EntityDamageEvent.DamageCause.FALL) {
             event.isCancelled = true
+            playerFall(ent, 0f)
         }
     }
 
