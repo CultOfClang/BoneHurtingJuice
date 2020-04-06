@@ -35,7 +35,7 @@ object MoveListener : Listener {
     }
 
     @EventHandler
-    fun ifThisWorks(e: PlayerVelocityEvent) {
+    fun ifThisWorks(e: PlayerMoveEvent) {
         val player = e.player
 
         if(!player.isInsideVehicle)
