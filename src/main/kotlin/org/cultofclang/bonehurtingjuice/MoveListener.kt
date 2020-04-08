@@ -1,17 +1,25 @@
 package org.cultofclang.bonehurtingjuice
 
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.block.data.Levelled
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerVelocityEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.player.PlayerBedEnterEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
 import java.util.*
+
+
+class BoneHurtDamageEvent(player: Player, damage: Double) : EntityDamageEvent(player, DamageCause.FALL, damage) {
+
+}
 
 object MoveListener : Listener {
     private val fallDistances:MutableMap<UUID, Float> = mutableMapOf()
@@ -19,7 +27,14 @@ object MoveListener : Listener {
     @EventHandler
     fun onPlayerDamage(event: EntityDamageEvent) {
         val ent = event.entity
+
+        if(event is BoneHurtDamageEvent) {
+            //ent.sendMessage("off ouch owie my bones")
+            return;
+        }
+
         if (ent is Player && event.cause == EntityDamageEvent.DamageCause.FALL) {
+            //ent.sendMessage("off my bones")
             event.isCancelled = true
             playerFall(ent, 0f)
         }
@@ -41,6 +56,15 @@ object MoveListener : Listener {
 
         if(!player.isInsideVehicle)
         playerFall(player, player.fallDistance)
+
+        val inBlock = player.location.block
+        val data =inBlock.blockData
+        if(data is Levelled){
+           if(data.level >= 8){
+               //player.sendMessage("in moving water")
+               player.velocity = player.velocity.setY(-0.1)
+           }
+        }
     }
 
     @EventHandler
@@ -60,6 +84,9 @@ object MoveListener : Listener {
             val damage = ((bonesBroken- Bones.minFallDist)* Bones.damageMultiplier)
             player.noDamageTicks = 0
             player.damage(damage)
+            val damageCause =  BoneHurtDamageEvent(player, damage)
+            player.lastDamageCause = damageCause
+            Bukkit.getPluginManager().callEvent(damageCause)
         }
     }
 
