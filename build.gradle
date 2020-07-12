@@ -68,4 +68,5 @@ if (project.hasProperty("plugin_path") && plugin_path) {
         from jar
         into plugin_path
     }
+    build.dependsOn copyJar
 }
