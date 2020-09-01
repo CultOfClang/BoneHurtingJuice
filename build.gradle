@@ -40,7 +40,7 @@ processResources {
 
 publishing {
     repositories {
-        maven githubPackagePublish.invoke("CultOfClang/Minecraft")
+        maven githubPackagePublish.invoke("MineInAbyss/BoneHurtingJuice")
     }
     publications {
         gpr(MavenPublication) {
