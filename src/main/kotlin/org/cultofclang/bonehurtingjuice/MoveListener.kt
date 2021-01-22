@@ -1,12 +1,13 @@
 package org.cultofclang.bonehurtingjuice
 
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.player.PlayerBedEnterEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
@@ -23,6 +24,11 @@ class BoneHurtDamageEvent(player: Player, damage: Double) : EntityDamageEvent(pl
 internal object MoveListener : Listener {
     val fallDistances: MutableMap<UUID, Float> = mutableMapOf()
 
+    private val beds = setOf(Material.WHITE_BED, Material.ORANGE_BED, Material.MAGENTA_BED,
+        Material.LIGHT_BLUE_BED, Material.YELLOW_BED, Material.LIME_BED, Material.PINK_BED,
+        Material.GRAY_BED, Material.LIGHT_GRAY_BED ,Material.CYAN_BED, Material.BLUE_BED,
+        Material.PURPLE_BED, Material.GREEN_BED , Material.BROWN_BED, Material.RED_BED, Material.BLACK_BED)
+
     @EventHandler
     fun onPlayerDamage(event: EntityDamageEvent) {
         if (event is BoneHurtDamageEvent) return
@@ -36,13 +42,9 @@ internal object MoveListener : Listener {
     }
 
     @EventHandler
-    fun onSleepWhileFalling(e: PlayerBedEnterEvent) {
-        val player = e.player
-
-        if (player.isInsideVehicle || player.fallDistance > Bones.minFallDist) {
-            e.isCancelled = true
-        }
-
+    fun PlayerInteractEvent.onPlayerInteract() {
+        if (player.fallDistance > Bones.minFallDist && clickedBlock?.type in beds)
+            isCancelled = true
     }
 
     @EventHandler
