@@ -60,25 +60,8 @@ internal object MoveListener : Listener {
             val higherBlock = it.add(0.0, 4.0, 0.0).block
             inBlock.isFlowing && higherBlock.isFlowing
         }?.let {
-            val armor = player.inventory.armorContents
-            var percentDmgReduc = 0.0
-
-            //for loops to iterate through each armor piece w/ protection enchant
-            for (piece: ItemStack in armor) {
-                for (enchant: Enchantment in piece.enchantments.keys) {
-                    if (enchant == Enchantment.PROTECTION_ENVIRONMENTAL) {
-                        //get leve of protection on armor piece
-                        val level: Int = piece.enchantments.get(Enchantment.PROTECTION_ENVIRONMENTAL) as Int
-                        //add damage reduction from current armor piece to running total
-                        percentDmgReduc += 0.04 * level
-                    }
-                }
-            }
-            //calculate multiplier to negate damage reduction from protection
-            val dmgReducCompensator = 1 / (1-percentDmgReduc)
-            //apply damage with damage multiplier so damage dealt is the same for all players, regardless of armor
-            player.damage(0.25 * dmgReducCompensator)
-
+            player.damage(0.0001)
+            player.health = player.health - 0.25
             player.world.spawnParticle(Particle.CLOUD, player.location.add(0.0, 0.75, 0.0), 1, 0.5, 0.5, 0.5, 0.3)
             player.velocity = player.velocity.apply {
                 x = Random.nextDouble(-0.15, 0.15) //TODO make configurable
