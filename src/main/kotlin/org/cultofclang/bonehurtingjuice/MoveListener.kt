@@ -2,7 +2,6 @@ package org.cultofclang.bonehurtingjuice
 
 import org.bukkit.GameMode
 import org.bukkit.Particle
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -13,7 +12,6 @@ import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
-import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.random.Random
 
