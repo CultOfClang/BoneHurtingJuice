@@ -59,7 +59,7 @@ internal object MoveListener : Listener {
             inBlock.isFlowing && higherBlock.isFlowing
         }?.let {
             player.damage(0.0001)
-            player.health = player.health - 0.25
+            player.health = player.health - (0.25 * Bones.wetDamageMultiplier)
             player.world.spawnParticle(Particle.CLOUD, player.location.add(0.0, 0.75, 0.0), 1, 0.5, 0.5, 0.5, 0.3)
             player.velocity = player.velocity.apply {
                 x = Random.nextDouble(-0.15, 0.15) //TODO make configurable
