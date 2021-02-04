@@ -12,7 +12,7 @@ class BoneHurtPlugin : JavaPlugin() {
     var doApplyForce = false
     var damageMultiplier = 0.5
     var minFallDist = 3
-    var wetDamageMultiplier = 0.5
+    var waterfallDamgeMultiplier = 0.5
 
     override fun onEnable() {
         getCommand("boneinfo")?.setExecutor(InfoCmd)
@@ -29,7 +29,7 @@ class BoneHurtPlugin : JavaPlugin() {
         doApplyForce = c.getBoolean("applyFallForce", false)
         damageMultiplier = c.getDouble("damageMultiplier", 0.5)
         minFallDist = c.getInt("minFallDist", 3)
-        wetDamageMultiplier = c.getDouble("wetDamageMultipler",  0.5)
+        waterfallDamgeMultiplier = c.getDouble("waterfallDamgeMultiplier",  0.5)
     }
 
     override fun onDisable() {
