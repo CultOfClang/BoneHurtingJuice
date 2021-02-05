@@ -27,3 +27,4 @@ hurtBlocks:
   - SCAFFOLDING
 applyFallForce: false
 damageMultiplier : 1
+waterfallDamgeMultiplier : 1

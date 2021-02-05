@@ -58,8 +58,12 @@ internal object MoveListener : Listener {
             val higherBlock = it.add(0.0, 4.0, 0.0).block
             inBlock.isFlowing && higherBlock.isFlowing
         }?.let {
+
+            //bypass armor damage reduction
+            player.damage(0.0001) // trigger damage sound effect
+            player.health = (player.health - (0.25 * Bones.waterfallDamgeMultiplier)).coerceAtLeast(0.0)
+
             player.world.spawnParticle(Particle.CLOUD, player.location.add(0.0, 0.75, 0.0), 1, 0.5, 0.5, 0.5, 0.3)
-            player.damage(0.25)
             player.velocity = player.velocity.apply {
                 x = Random.nextDouble(-0.15, 0.15) //TODO make configurable
                 y = -0.1
