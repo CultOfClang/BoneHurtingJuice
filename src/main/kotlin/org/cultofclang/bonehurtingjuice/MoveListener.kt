@@ -61,7 +61,7 @@ internal object MoveListener : Listener {
 
             //bypass armor damage reduction
             player.damage(0.0001) // trigger damage sound effect
-            player.health = (player.health - (0.25 * Bones.waterfallDamgeMultiplier)).coerceAtLeast(0.0)
+            player.health = (player.health - (0.25 * Bones.waterfallDamageMultiplier)).coerceAtLeast(0.0)
 
             player.world.spawnParticle(Particle.CLOUD, player.location.add(0.0, 0.75, 0.0), 1, 0.5, 0.5, 0.5, 0.3)
             player.velocity = player.velocity.apply {

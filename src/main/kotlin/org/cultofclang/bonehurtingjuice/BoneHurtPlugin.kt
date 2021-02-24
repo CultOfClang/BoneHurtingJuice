@@ -9,10 +9,9 @@ val Bones: BoneHurtPlugin by lazy { JavaPlugin.getPlugin(BoneHurtPlugin::class.j
 
 class BoneHurtPlugin : JavaPlugin() {
     var hurtBlocks: Set<Material> = emptySet()
-    var doApplyForce = false
     var damageMultiplier = 0.5
     var minFallDist = 3
-    var waterfallDamgeMultiplier = 0.5
+    var waterfallDamageMultiplier = 0.5
 
     override fun onEnable() {
         getCommand("boneinfo")?.setExecutor(InfoCmd)
@@ -26,10 +25,9 @@ class BoneHurtPlugin : JavaPlugin() {
 
         val hurtBlockRaw = c.getStringList("hurtBlocks")
         hurtBlocks = hurtBlockRaw.map { Material.valueOf(it) }.toSet()
-        doApplyForce = c.getBoolean("applyFallForce", false)
         damageMultiplier = c.getDouble("damageMultiplier", 0.5)
         minFallDist = c.getInt("minFallDist", 3)
-        waterfallDamgeMultiplier = c.getDouble("waterfallDamgeMultiplier",  0.5)
+        waterfallDamageMultiplier = c.getDouble("waterfallDamageMultiplier",  0.5)
     }
 
     override fun onDisable() {
