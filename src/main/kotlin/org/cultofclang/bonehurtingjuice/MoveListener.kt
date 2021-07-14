@@ -1,122 +1,99 @@
 package org.cultofclang.bonehurtingjuice
 
-import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Material
-import org.bukkit.block.data.Levelled
+import org.bukkit.Particle
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
-import org.bukkit.event.player.PlayerBedEnterEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
 import java.util.*
+import kotlin.random.Random
 
 
 class BoneHurtDamageEvent(player: Player, damage: Double) : EntityDamageEvent(player, DamageCause.FALL, damage) {
 
 }
 
-object MoveListener : Listener {
-    private val fallDistances:MutableMap<UUID, Float> = mutableMapOf()
+internal object MoveListener : Listener {
+    val fallDistances: MutableMap<UUID, Float> = mutableMapOf()
+
+    private val beds = setOf(Material.WHITE_BED, Material.ORANGE_BED, Material.MAGENTA_BED,
+        Material.LIGHT_BLUE_BED, Material.YELLOW_BED, Material.LIME_BED, Material.PINK_BED,
+        Material.GRAY_BED, Material.LIGHT_GRAY_BED ,Material.CYAN_BED, Material.BLUE_BED,
+        Material.PURPLE_BED, Material.GREEN_BED , Material.BROWN_BED, Material.RED_BED, Material.BLACK_BED)
 
     @EventHandler
     fun onPlayerDamage(event: EntityDamageEvent) {
-        val ent = event.entity
+        if (event is BoneHurtDamageEvent) return
 
-        if(event is BoneHurtDamageEvent) {
-            //ent.sendMessage("off ouch owie my bones")
-            return;
-        }
+        val entity = event.entity
 
-        if (ent is Player && event.cause == EntityDamageEvent.DamageCause.FALL) {
-            //ent.sendMessage("off my bones")
+        if (entity is Player && event.cause == EntityDamageEvent.DamageCause.FALL) {
             event.isCancelled = true
-            playerFall(ent, 0f)
+            entity.hurtBones(0f)
         }
     }
 
     @EventHandler
-    fun cantUseBedsIfYouAreFalling(e: PlayerBedEnterEvent) {
-        val player = e.player
-
-        if(player.isInsideVehicle || player.fallDistance > Bones.minFallDist ){
-            e.isCancelled = true
-        }
-
+    fun PlayerInteractEvent.onPlayerInteract() {
+        if (player.fallDistance > Bones.minFallDist && clickedBlock?.type in beds)
+            isCancelled = true
     }
 
     @EventHandler
-    fun ifThisWorks(e: PlayerMoveEvent) {
+    fun onSwimInWaterfall(e: PlayerMoveEvent) {
         val player = e.player
+        if(player.gameMode != GameMode.SURVIVAL && player.gameMode != GameMode.ADVENTURE) return
 
-        if(!player.isInsideVehicle)
-        playerFall(player, player.fallDistance)
+        if (!player.isInsideVehicle)
+            player.hurtBones(player.fallDistance)
 
-        val inBlock = player.location.block
-        val data =inBlock.blockData
-        if(data is Levelled){
-           if(data.level >= 8){
-               //player.sendMessage("in moving water")
-               player.velocity = player.velocity.setY(-0.1)
-           }
+        player.location.findLocationAround(radius = 1, scale = 0.25) {
+            val inBlock = it.block
+            val higherBlock = it.add(0.0, 4.0, 0.0).block
+            inBlock.isFlowing && higherBlock.isFlowing
+        }?.let {
+
+            //bypass armor damage reduction
+            player.damage(0.0001) // trigger damage sound effect
+            player.health = (player.health - (0.25 * Bones.waterfallDamageMultiplier)).coerceAtLeast(0.0)
+
+            player.world.spawnParticle(Particle.CLOUD, player.location.add(0.0, 0.75, 0.0), 1, 0.5, 0.5, 0.5, 0.3)
+            player.velocity = player.velocity.apply {
+                x = Random.nextDouble(-0.15, 0.15) //TODO make configurable
+                y = -0.1
+                z = Random.nextDouble(-0.15, 0.15)
+            }
         }
     }
 
     @EventHandler
     fun onRespawn(e: PlayerRespawnEvent) {
         val player = e.player
-        player.fallDistance = 0f
-        fallDistances[player.uniqueId]  = 0f
-    }
-
-    private fun playerFall(player:Player, fallDist:Float){
-        val lastFallDist = fallDistances.getOrDefault(player.uniqueId, 0f)
-        val bonesBroken = (lastFallDist - fallDist).coerceAtLeast(0f)
-        fallDistances[player.uniqueId]  = fallDist
-
-        if(bonesBroken > Bones.minFallDist) {
-            //if(debugPrint)
-            val damage = ((bonesBroken- Bones.minFallDist)* Bones.damageMultiplier)
-            player.noDamageTicks = 0
-            player.damage(damage)
-            val damageCause =  BoneHurtDamageEvent(player, damage)
-            player.lastDamageCause = damageCause
-            Bukkit.getPluginManager().callEvent(damageCause)
-        }
+        player.resetFallDistance()
     }
 
     @EventHandler
-    fun onMove(e: VehicleMoveEvent){
-        for (rider in e.vehicle.passengers){
-            if(rider != null && rider is Player){
-                //rider.sendMessage("boat fell ${e.vehicle.fallDistance}")
-                rider.fallDistance = e.vehicle.fallDistance
-                playerFall(rider, e.vehicle.fallDistance)
-            }
-        }
+    fun onVehicleMove(e: VehicleMoveEvent) = e.forRidingPlayers { rider ->
+        rider.fallDistance = e.vehicle.fallDistance
+        rider.hurtBones(e.vehicle.fallDistance)
     }
 
     @EventHandler
-    fun onExit(e: VehicleExitEvent){
-        for (rider in e.vehicle.passengers){
-            if(rider != null && rider is Player){
-                rider.fallDistance = e.vehicle.fallDistance
-            }
-        }
+    fun onExit(e: VehicleExitEvent) = e.forRidingPlayers { rider ->
+        rider.fallDistance = e.vehicle.fallDistance
     }
 
     @EventHandler
-    fun onEnter(e: VehicleEnterEvent){
-        for (rider in e.vehicle.passengers){
-            if(rider != null && rider is Player){
-                e.vehicle.fallDistance += rider.fallDistance
-                rider.fallDistance = 0f
-            }
-        }
+    fun onEnter(e: VehicleEnterEvent) = e.forRidingPlayers { rider ->
+        e.vehicle.fallDistance += rider.fallDistance
+        rider.fallDistance = 0f
     }
 }
