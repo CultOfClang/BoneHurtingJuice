@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.data.Levelled
+import org.bukkit.block.data.type.BubbleColumn
 import org.bukkit.entity.Player
 import org.bukkit.event.vehicle.VehicleEvent
 
@@ -15,6 +16,12 @@ internal val Block.isFlowing: Boolean
     get() {
         val blockData = blockData
         return (blockData is Levelled) && blockData.level >= 8
+    }
+
+internal val Block.isBubble: Boolean
+    get() {
+        val blockData = blockData
+        return (blockData is BubbleColumn)
     }
 
 internal fun Location.findLocationAround(radius: Int, scale: Double, predicate: (Location) -> Boolean): Location? {
