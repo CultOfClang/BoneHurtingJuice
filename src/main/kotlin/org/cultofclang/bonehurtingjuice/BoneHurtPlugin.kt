@@ -12,6 +12,8 @@ class BoneHurtPlugin : JavaPlugin() {
     var damageMultiplier = 0.5
     var minFallDist = 3
     var waterfallDamageMultiplier = 0.5
+    var waterfallMoveMultiplier = 0.15
+    var bubbleColumnBreathMultiplier = 2.0
 
     override fun onEnable() {
         getCommand("boneinfo")?.setExecutor(InfoCmd)
@@ -27,7 +29,9 @@ class BoneHurtPlugin : JavaPlugin() {
         hurtBlocks = hurtBlockRaw.map { Material.valueOf(it) }.toSet()
         damageMultiplier = c.getDouble("damageMultiplier", 0.5)
         minFallDist = c.getInt("minFallDist", 3)
-        waterfallDamageMultiplier = c.getDouble("waterfallDamageMultiplier",  0.5)
+        waterfallDamageMultiplier = c.getDouble("waterfallDamageMultiplier", 0.5)
+        waterfallMoveMultiplier = c.getDouble("waterfallMoveMultiplier", 0.15)
+        bubbleColumnBreathMultiplier = c.getDouble("bubbleColumnBreathMultiplier", 2.0)
     }
 
     override fun onDisable() {

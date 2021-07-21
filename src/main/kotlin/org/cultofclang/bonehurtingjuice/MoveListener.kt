@@ -1,11 +1,15 @@
 package org.cultofclang.bonehurtingjuice
 
+import org.bukkit.Bukkit
+import org.bukkit.Bukkit.getServer
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Particle
+import org.bukkit.block.data.type.BubbleColumn
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityAirChangeEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -58,7 +62,7 @@ internal object MoveListener : Listener {
         player.location.findLocationAround(radius = 1, scale = 0.25) {
             val inBlock = it.block
             val higherBlock = it.add(0.0, 4.0, 0.0).block
-            inBlock.isFlowing && higherBlock.isFlowing
+            (inBlock.isFlowing && higherBlock.isFlowing)
         }?.let {
 
             //bypass armor damage reduction
@@ -67,11 +71,28 @@ internal object MoveListener : Listener {
 
             player.world.spawnParticle(Particle.CLOUD, player.location.add(0.0, 0.75, 0.0), 1, 0.5, 0.5, 0.5, 0.3)
             player.velocity = player.velocity.apply {
-                x = Random.nextDouble(-0.15, 0.15) //TODO make configurable
+                x = Random.nextDouble(-Bones.waterfallMoveMultiplier, Bones.waterfallMoveMultiplier)
                 y = -0.1
-                z = Random.nextDouble(-0.15, 0.15)
+                z = Random.nextDouble(-Bones.waterfallMoveMultiplier, Bones.waterfallMoveMultiplier)
             }
         }
+        player.location.findLocationAround(radius = 1, scale = 0.50) {
+            //val inBlock = it.block
+            val higherBlock = it.add(0.0, 4.0, 0.0).block
+            (higherBlock.isBubbleColumn)
+        }?.let {
+            if (player.maximumAir <= 0) {
+                player.remainingAir = player.remainingAir
+                player.damage(0.0001) // trigger damage sound effect
+                player.health = (player.health - (0.25 * Bones.bubbleColumnBreathMultiplier)).coerceAtLeast(0.0)
+
+            } else {
+                player.remainingAir = (player.maximumAir - 5)
+                player.maximumAir = player.remainingAir.coerceAtLeast(0)
+            }
+
+        }
+        player.maximumAir = player.remainingAir
     }
 
     @EventHandler
