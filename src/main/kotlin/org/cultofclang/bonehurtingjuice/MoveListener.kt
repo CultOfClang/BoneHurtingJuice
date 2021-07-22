@@ -84,10 +84,10 @@ internal object MoveListener : Listener {
             if (player.maximumAir <= 0) {
                 player.remainingAir = player.remainingAir
                 player.damage(0.0001) // trigger damage sound effect
-                player.health = (player.health - (0.25 * Bones.bubbleColumnBreathMultiplier)).coerceAtLeast(0.0)
+                player.health = (player.health - (0.25 * Bones.bubbleColumnDamageMultiplier)).coerceAtLeast(0.0)
 
             } else {
-                player.remainingAir = (player.maximumAir - 5)
+                player.remainingAir = (player.maximumAir - Bones.bubbleColumnBreathMultiplier)
                 player.maximumAir = player.remainingAir.coerceAtLeast(0)
             }
 
