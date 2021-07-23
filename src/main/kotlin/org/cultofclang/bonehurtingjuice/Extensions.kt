@@ -19,10 +19,7 @@ internal val Block.isFlowing: Boolean
         return (blockData is Levelled) && blockData.level >= 8
     }
 internal val Block.isBubbleColumn: Boolean
-    get() {
-        val blockData = blockData
-        return (blockData is BubbleColumn)
-    }
+    get() = blockData is BubbleColumn
 
 internal fun Location.findLocationAround(radius: Int, scale: Double, predicate: (Location) -> Boolean): Location? {
     for (x in -radius..radius) {

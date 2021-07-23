@@ -62,7 +62,7 @@ internal object MoveListener : Listener {
         player.location.findLocationAround(radius = 1, scale = 0.25) {
             val inBlock = it.block
             val higherBlock = it.add(0.0, 4.0, 0.0).block
-            (inBlock.isFlowing && higherBlock.isFlowing)
+            inBlock.isFlowing && higherBlock.isFlowing
         }?.let {
 
             //bypass armor damage reduction
@@ -77,9 +77,8 @@ internal object MoveListener : Listener {
             }
         }
         player.location.findLocationAround(radius = 1, scale = 0.50) {
-            //val inBlock = it.block
             val higherBlock = it.add(0.0, 4.0, 0.0).block
-            (higherBlock.isBubbleColumn)
+            higherBlock.isBubbleColumn
         }?.let {
             if (player.maximumAir <= 0) {
                 player.remainingAir = player.remainingAir
