@@ -38,8 +38,8 @@ internal fun Player.hurtBones(fallDist: Float) {
     val bonesBroken = (lastFallDist - fallDist).coerceAtLeast(0f)
     MoveListener.fallDistances[uniqueId] = fallDist
 
-    if (bonesBroken > Bones.minFallDist) {
-        val damage = ((bonesBroken - Bones.minFallDist) * Bones.damageMultiplier)
+    if (bonesBroken > BoneHurtConfig.data.minFallDist) {
+        val damage = ((bonesBroken - BoneHurtConfig.data.minFallDist) * BoneHurtConfig.data.damageMultiplier)
         noDamageTicks = 0
         damage(damage)
         val damageCause = BoneHurtDamageEvent(this, damage)
