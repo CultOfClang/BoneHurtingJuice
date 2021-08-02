@@ -1,15 +1,11 @@
 package org.cultofclang.bonehurtingjuice
 
-import org.bukkit.Bukkit
-import org.bukkit.Bukkit.getServer
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Particle
-import org.bukkit.block.data.type.BubbleColumn
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityAirChangeEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -28,10 +24,12 @@ class BoneHurtDamageEvent(player: Player, damage: Double) : EntityDamageEvent(pl
 internal object MoveListener : Listener {
     val fallDistances: MutableMap<UUID, Float> = mutableMapOf()
 
-    private val beds = setOf(Material.WHITE_BED, Material.ORANGE_BED, Material.MAGENTA_BED,
+    private val beds = setOf(
+        Material.WHITE_BED, Material.ORANGE_BED, Material.MAGENTA_BED,
         Material.LIGHT_BLUE_BED, Material.YELLOW_BED, Material.LIME_BED, Material.PINK_BED,
-        Material.GRAY_BED, Material.LIGHT_GRAY_BED ,Material.CYAN_BED, Material.BLUE_BED,
-        Material.PURPLE_BED, Material.GREEN_BED , Material.BROWN_BED, Material.RED_BED, Material.BLACK_BED)
+        Material.GRAY_BED, Material.LIGHT_GRAY_BED, Material.CYAN_BED, Material.BLUE_BED,
+        Material.PURPLE_BED, Material.GREEN_BED, Material.BROWN_BED, Material.RED_BED, Material.BLACK_BED
+    )
 
     @EventHandler
     fun onPlayerDamage(event: EntityDamageEvent) {
@@ -54,7 +52,7 @@ internal object MoveListener : Listener {
     @EventHandler
     fun onSwimInWaterfall(e: PlayerMoveEvent) {
         val player = e.player
-        if(player.gameMode != GameMode.SURVIVAL && player.gameMode != GameMode.ADVENTURE) return
+        if (player.gameMode != GameMode.SURVIVAL && player.gameMode != GameMode.ADVENTURE) return
 
         if (!player.isInsideVehicle)
             player.hurtBones(player.fallDistance)
@@ -71,9 +69,15 @@ internal object MoveListener : Listener {
 
             player.world.spawnParticle(Particle.CLOUD, player.location.add(0.0, 0.75, 0.0), 1, 0.5, 0.5, 0.5, 0.3)
             player.velocity = player.velocity.apply {
-                x = Random.nextDouble(-Bones.waterfallMoveMultiplier, Bones.waterfallMoveMultiplier)
+                x = Random.nextDouble(
+                    -BoneHurtConfig.data.waterfallMoveMultiplier,
+                    BoneHurtConfig.data.waterfallMoveMultiplier
+                )
                 y = -0.1
-                z = Random.nextDouble(-Bones.waterfallMoveMultiplier, Bones.waterfallMoveMultiplier)
+                z = Random.nextDouble(
+                    -BoneHurtConfig.data.waterfallMoveMultiplier,
+                    BoneHurtConfig.data.waterfallMoveMultiplier
+                )
             }
         }
         player.location.findLocationAround(radius = 1, scale = 0.50) {
@@ -83,10 +87,11 @@ internal object MoveListener : Listener {
             if (player.maximumAir <= 0) {
                 player.remainingAir = player.remainingAir
                 player.damage(0.0001) // trigger damage sound effect
-                player.health = (player.health - (0.25 * Bones.bubbleColumnDamageMultiplier)).coerceAtLeast(0.0)
+                player.health =
+                    (player.health - (0.25 * BoneHurtConfig.data.bubbleColumnDamageMultiplier)).coerceAtLeast(0.0)
 
             } else {
-                player.remainingAir = (player.maximumAir - Bones.bubbleColumnBreathMultiplier)
+                player.remainingAir = (player.maximumAir - BoneHurtConfig.data.bubbleColumnBreathMultiplier)
                 player.maximumAir = player.remainingAir.coerceAtLeast(0)
             }
 

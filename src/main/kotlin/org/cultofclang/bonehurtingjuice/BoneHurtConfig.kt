@@ -15,5 +15,8 @@ object BoneHurtConfig : IdofrontConfig<BoneHurtConfig.Data>(
         val damageMultiplier: Double = 0.5,
         val minFallDist: Int = 3,
         val waterfallDamageMultiplier: Double = 0.5,
+        val waterfallMoveMultiplier: Double = 0.15,
+        val bubbleColumnDamageMultiplier: Double = 2.0,
+        val bubbleColumnBreathMultiplier: Int = 5,
     )
 }
