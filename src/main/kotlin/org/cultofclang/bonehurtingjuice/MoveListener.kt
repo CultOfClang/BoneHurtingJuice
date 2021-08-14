@@ -1,5 +1,6 @@
 package org.cultofclang.bonehurtingjuice
 
+import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -32,14 +33,12 @@ internal object MoveListener : Listener {
     )
 
     @EventHandler
-    fun onPlayerDamage(event: EntityDamageEvent) {
-        if (event is BoneHurtDamageEvent) return
+    fun EntityDamageEvent.onPlayerDamage() {
+        if (this is BoneHurtDamageEvent) return
 
-        val entity = event.entity
-
-        if (entity is Player && event.cause == EntityDamageEvent.DamageCause.FALL) {
-            event.isCancelled = true
-            entity.hurtBones(0f)
+        if (entity is Player && cause == EntityDamageEvent.DamageCause.FALL) {
+            isCancelled = true
+            (entity as Player).hurtBones(0f)
         }
     }
 
@@ -50,8 +49,19 @@ internal object MoveListener : Listener {
     }
 
     @EventHandler
-    fun onSwimInWaterfall(e: PlayerMoveEvent) {
-        val player = e.player
+    fun EntityMoveEvent.entityMove() {
+        if(entity.passengers.isNotEmpty()) {
+            entity.passengers.forEach { rider ->
+                if(rider is Player) {
+                    rider.fallDistance = entity.fallDistance
+                    rider.hurtBones(entity.fallDistance)
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    fun PlayerMoveEvent.playerMove() {
         if (player.gameMode != GameMode.SURVIVAL && player.gameMode != GameMode.ADVENTURE) return
 
         if (!player.isInsideVehicle)
@@ -100,25 +110,24 @@ internal object MoveListener : Listener {
     }
 
     @EventHandler
-    fun onRespawn(e: PlayerRespawnEvent) {
-        val player = e.player
+    fun PlayerRespawnEvent.onRespawn() {
         player.resetFallDistance()
     }
 
     @EventHandler
-    fun onVehicleMove(e: VehicleMoveEvent) = e.forRidingPlayers { rider ->
-        rider.fallDistance = e.vehicle.fallDistance
-        rider.hurtBones(e.vehicle.fallDistance)
+    fun VehicleMoveEvent.onVehicleMove() = forRidingPlayers { rider ->
+        rider.fallDistance = vehicle.fallDistance
+        rider.hurtBones(vehicle.fallDistance)
     }
 
     @EventHandler
-    fun onExit(e: VehicleExitEvent) = e.forRidingPlayers { rider ->
-        rider.fallDistance = e.vehicle.fallDistance
+    fun VehicleExitEvent.onExit() = forRidingPlayers { rider ->
+        rider.fallDistance = vehicle.fallDistance
     }
 
     @EventHandler
-    fun onEnter(e: VehicleEnterEvent) = e.forRidingPlayers { rider ->
-        e.vehicle.fallDistance += rider.fallDistance
+    fun VehicleEnterEvent.onEnter() = forRidingPlayers { rider ->
+        vehicle.fallDistance += rider.fallDistance
         rider.fallDistance = 0f
     }
 }
