@@ -11,6 +11,8 @@ class BoneHurtPlugin : JavaPlugin() {
 
     override fun onEnable() {
         LibraryLoaderInjector.inject(this)
+        saveDefaultConfig()
+        BoneHurtConfig.load()
         getCommand("boneinfo")?.setExecutor(InfoCmd)
         registerEvents(
             MoveListener
@@ -20,6 +22,5 @@ class BoneHurtPlugin : JavaPlugin() {
 
     override fun onDisable() {
         logger.info("I don't think you see the gravity of the situation.")
-        saveDefaultConfig()
     }
 }
