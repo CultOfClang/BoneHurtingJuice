@@ -51,11 +51,9 @@ internal object MoveListener : Listener {
     @EventHandler
     fun EntityMoveEvent.entityMove() {
         if(entity.passengers.isNotEmpty()) {
-            entity.passengers.forEach { rider ->
-                if(rider is Player) {
-                    rider.fallDistance = entity.fallDistance
-                    rider.hurtBones(entity.fallDistance)
-                }
+            entity.passengers.filterIsInstance<Player>().forEach { rider ->
+                rider.fallDistance = entity.fallDistance
+                rider.hurtBones(entity.fallDistance)
             }
         }
     }
