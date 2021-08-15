@@ -6,14 +6,17 @@ import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerRespawnEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
+import org.checkerframework.checker.index.qual.Positive
 import java.util.*
 import kotlin.random.Random
 
@@ -55,6 +58,19 @@ internal object MoveListener : Listener {
                 rider.fallDistance = entity.fallDistance
                 rider.hurtBones(entity.fallDistance)
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    fun PlayerTeleportEvent.playerTeleport() {
+        if (player.gameMode != GameMode.SURVIVAL && player.gameMode != GameMode.ADVENTURE) return
+        val p = player.location.y - to.toBlockLocation().y
+        if (this.cause == PlayerTeleportEvent.TeleportCause.ENDER_PEARL || this.cause == PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT){
+            if (!this.isCancelled) //Cancels the falldamage if another plugin cancels the event.
+                if (p > 0) {
+                    player.fallDistance = p.toFloat()
+                    player.hurtBones(player.fallDistance)
+                }
         }
     }
 
