@@ -63,15 +63,13 @@ internal object MoveListener : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     fun PlayerTeleportEvent.playerTeleport() {
-        if (player.gameMode != GameMode.SURVIVAL && player.gameMode != GameMode.ADVENTURE) return
-        val p = player.location.y - to.toBlockLocation().y
-        if (this.cause == PlayerTeleportEvent.TeleportCause.ENDER_PEARL || this.cause == PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT){
-            if (!this.isCancelled) //Cancels the falldamage if another plugin cancels the event.
-                if (p > 0) {
-                    player.fallDistance = p.toFloat()
-                    player.hurtBones(player.fallDistance)
-                }
-        }
+        if (player.gameMode == GameMode.CREATIVE) return
+        if (this.cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL && this.cause != PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT) return
+        if (this.isCancelled) return //Cancels the falldamage if another plugin cancels the event.
+        val teleportDistance = player.location.y - to.toBlockLocation().y
+        if (teleportDistance <= 0) return
+        player.fallDistance = teleportDistance.toFloat()
+        player.hurtBones(player.fallDistance)
     }
 
     @EventHandler
