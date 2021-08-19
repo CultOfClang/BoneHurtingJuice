@@ -79,7 +79,7 @@ internal object MoveListener : Listener {
         if (!player.isInsideVehicle)
             player.hurtBones(player.fallDistance)
 
-        player.location.findLocationAround(radius = 1, scale = 0.25) {
+        player.location.findLocationAround(radius = 1, scale = 0.30) {
             val inBlock = it.block
             val higherBlock = it.add(0.0, 4.0, 0.0).block
             inBlock.isFlowing && higherBlock.isFlowing
@@ -102,7 +102,7 @@ internal object MoveListener : Listener {
                 )
             }
         }
-        player.location.findLocationAround(radius = 1, scale = 0.50) {
+        player.location.findLocationAround(radius = 1, scale = 0.30) {
             val higherBlock = it.add(0.0, 4.0, 0.0).block
             higherBlock.isBubbleColumn
         }?.let {
