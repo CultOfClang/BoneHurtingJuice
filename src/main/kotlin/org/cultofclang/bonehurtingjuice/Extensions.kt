@@ -37,17 +37,19 @@ internal fun Player.resetFallDistance() {
     MoveListener.fallDistances[uniqueId] = 0f
 }
 
-internal fun Player.hurtBones(fallDist: Float) {
+fun Player.hurtBones(fallDist: Float) {
     val lastFallDist = MoveListener.fallDistances.getOrDefault(uniqueId, 0f)
     val bonesBroken = (lastFallDist - fallDist).coerceAtLeast(0f)
     MoveListener.fallDistances[uniqueId] = fallDist
 
     if (bonesBroken > BoneHurtConfig.data.minFallDist) {
         val damage = ((bonesBroken - BoneHurtConfig.data.minFallDist) * BoneHurtConfig.data.damageMultiplier)
-        noDamageTicks = 0
-        damage(damage)
         val damageCause = BoneHurtDamageEvent(this, damage)
-        lastDamageCause = damageCause
         Bukkit.getPluginManager().callEvent(damageCause)
+        if (!damageCause.isCancelled) {
+            noDamageTicks = 0
+            damage(damage)
+            lastDamageCause = damageCause
+        }
     }
 }
