@@ -1,7 +1,7 @@
 package org.cultofclang.bonehurtingjuice
 
 import com.mineinabyss.idofront.plugin.registerEvents
-import com.mineinabyss.idofront.slimjar.LibraryLoaderInjector
+import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import org.bukkit.plugin.java.JavaPlugin
 import org.cultofclang.bonehurtingjuice.command.InfoCmd
 
@@ -10,7 +10,7 @@ val Bones: BoneHurtPlugin by lazy { JavaPlugin.getPlugin(BoneHurtPlugin::class.j
 class BoneHurtPlugin : JavaPlugin() {
 
     override fun onEnable() {
-        LibraryLoaderInjector.inject(this)
+        IdofrontSlimjar.loadToLibraryLoader(this)
         saveDefaultConfig()
         BoneHurtConfig.load()
         getCommand("boneinfo")?.setExecutor(InfoCmd)

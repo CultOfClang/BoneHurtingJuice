@@ -29,4 +29,4 @@ damageMultiplier: 0.5
 minFallDist: 3
 waterfallDamageMultiplier: 0.5
 waterfallMoveMultiplier: 0.15
-bubbleColumnBreathMultiplier: 2.0
+bubbleColumnBreathMultiplier: 2

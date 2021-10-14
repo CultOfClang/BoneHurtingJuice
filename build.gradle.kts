@@ -1,14 +1,20 @@
+
+val idofrontVersion: String by project
+
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
+    id("com.mineinabyss.conventions.slimjar")
     id("com.mineinabyss.conventions.publication")
+    id("com.mineinabyss.conventions.copyjar")
     kotlin("plugin.serialization")
 }
 
 dependencies {
-    slim(kotlin("stdlib-jdk8"))
-    slim("org.jetbrains.kotlinx:kotlinx-serialization-json")
-    slim("com.charleskorn.kaml:kaml")
 
-    implementation("com.mineinabyss:idofront:1.17.1-0.6.23")
+    // From Geary
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    compileOnly("com.charleskorn.kaml:kaml")
+
+    implementation("com.mineinabyss:idofront:$idofrontVersion")
 }

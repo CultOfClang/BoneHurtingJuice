@@ -2,6 +2,7 @@ name: BoneHurtingJuice
 version: ${plugin_version}
 main: org.cultofclang.bonehurtingjuice.BoneHurtPlugin
 api-version: 1.17
+depend: [Geary]
 commands:
   boneinfo:
        description: Why are my bones hurting?
