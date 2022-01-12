@@ -10,6 +10,11 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+repositories {
+    mavenCentral()
+    maven("https://repo.mineinabyss.com/releases")
+}
+
 dependencies {
 
     // From Geary
