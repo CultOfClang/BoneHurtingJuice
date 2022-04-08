@@ -1,9 +1,11 @@
 package org.cultofclang.bonehurtingjuice
 
+import io.papermc.paper.event.entity.EntityInsideBlockEvent
 import io.papermc.paper.event.entity.EntityMoveEvent
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Particle
+import org.bukkit.block.data.type.Bed
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -16,7 +18,6 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
-import org.checkerframework.checker.index.qual.Positive
 import java.util.*
 import kotlin.random.Random
 
@@ -28,12 +29,10 @@ class BoneHurtDamageEvent(player: Player, damage: Double) : EntityDamageEvent(pl
 internal object MoveListener : Listener {
     val fallDistances: MutableMap<UUID, Float> = mutableMapOf()
 
-    private val beds = setOf(
-        Material.WHITE_BED, Material.ORANGE_BED, Material.MAGENTA_BED,
-        Material.LIGHT_BLUE_BED, Material.YELLOW_BED, Material.LIME_BED, Material.PINK_BED,
-        Material.GRAY_BED, Material.LIGHT_GRAY_BED, Material.CYAN_BED, Material.BLUE_BED,
-        Material.PURPLE_BED, Material.GREEN_BED, Material.BROWN_BED, Material.RED_BED, Material.BLACK_BED
-    )
+    @EventHandler
+    fun EntityInsideBlockEvent.cancelHoneyAndWeb() {
+        if (block.type == Material.HONEY_BLOCK || block.type == Material.COBWEB) isCancelled = true
+    }
 
     @EventHandler
     fun EntityDamageEvent.onPlayerDamage() {
@@ -47,7 +46,7 @@ internal object MoveListener : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.onPlayerInteract() {
-        if (player.fallDistance > BoneHurtConfig.data.minFallDist && clickedBlock?.type in beds)
+        if (player.fallDistance > BoneHurtConfig.data.minFallDist && clickedBlock?.blockData is Bed)
             isCancelled = true
     }
 
