@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.data.Levelled
 import org.bukkit.block.data.type.BubbleColumn
+import org.bukkit.block.data.type.Light
 import org.bukkit.entity.Player
 import org.bukkit.event.vehicle.VehicleEvent
 
@@ -16,7 +17,7 @@ internal fun VehicleEvent.forRidingPlayers(action: (Player) -> Unit) = vehicle.p
 internal val Block.isFlowing: Boolean
     get() {
         val blockData = blockData
-        return (blockData is Levelled) && blockData.level >= 8
+        return (blockData is Levelled) && blockData.level >= 8 && blockData !is Light
     }
 internal val Block.isBubbleColumn: Boolean
     get() = blockData is BubbleColumn
