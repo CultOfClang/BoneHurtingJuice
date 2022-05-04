@@ -11,10 +11,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerRespawnEvent
-import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.event.player.*
 import org.bukkit.event.vehicle.VehicleEnterEvent
 import org.bukkit.event.vehicle.VehicleExitEvent
 import org.bukkit.event.vehicle.VehicleMoveEvent
@@ -28,6 +25,14 @@ class BoneHurtDamageEvent(player: Player, damage: Double) : EntityDamageEvent(pl
 
 internal object MoveListener : Listener {
     val fallDistances: MutableMap<UUID, Float> = mutableMapOf()
+
+    @EventHandler
+    fun PlayerJoinEvent.resetMaxAir() {
+        if (!player.isInWaterOrBubbleColumn) {
+            player.maximumAir = 300
+            player.remainingAir = 300
+        }
+    }
 
     @EventHandler
     fun EntityInsideBlockEvent.cancelHoneyAndWeb() {
