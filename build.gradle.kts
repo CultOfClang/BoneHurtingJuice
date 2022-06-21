@@ -1,5 +1,3 @@
-import Com_mineinabyss_conventions_platform_gradle.Deps
-
 val idofrontVersion: String by project
 
 plugins {
@@ -18,8 +16,10 @@ repositories {
 dependencies {
 
     // From Geary
-    compileOnly(Deps.kotlinx.serialization.json)
-    compileOnly(Deps.kotlinx.serialization.kaml)
+    compileOnly(libs.kotlin.stdlib)
+    compileOnly(libs.kotlinx.serialization.kaml) {
+        exclude(group = "org.jetbrains.kotlin")
+    }
 
-    implementation("com.mineinabyss:idofront:$idofrontVersion")
+    implementation(libs.idofront.core)
 }
